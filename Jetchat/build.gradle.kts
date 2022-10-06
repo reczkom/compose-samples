@@ -27,6 +27,7 @@ buildscript {
         classpath(libs.android.gradlePlugin)
         classpath(libs.kotlin.gradlePlugin)
         classpath(libs.spotless.gradlePlugin)
+        classpath("com.android.tools.build:gradle:7.2.2")
     }
 }
 
