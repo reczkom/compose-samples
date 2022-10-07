@@ -66,7 +66,8 @@ class UserInputTest {
                     ConversationContent(
                         uiState = exampleUiState,
                         navigateToProfile = { },
-                        onNavIconPressed = { }
+                        onNavIconPressed = { },
+                        checkPermission = { }
                     )
                 }
             }
