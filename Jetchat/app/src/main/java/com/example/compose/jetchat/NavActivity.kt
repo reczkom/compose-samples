@@ -16,7 +16,12 @@
 
 package com.example.compose.jetchat
 
+import android.Manifest
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Looper
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.consumeWindowInsets
@@ -29,16 +34,23 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.viewinterop.AndroidViewBinding
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.core.os.bundleOf
 import androidx.core.view.WindowCompat
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.compose.ExperimentalLifecycleComposeApi
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import com.example.compose.jetchat.components.JetchatDrawer
 import com.example.compose.jetchat.conversation.BackPressHandler
 import com.example.compose.jetchat.conversation.LocalBackPressedDispatcher
 import com.example.compose.jetchat.databinding.ContentMainBinding
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 
 /**
@@ -51,6 +63,18 @@ class NavActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        viewModel.eventsFlow
+            .onEach {
+                when (it) {
+                    is MainViewModel.Event.CheckPermission -> {
+                        val hasFine = ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+
+                        if (hasFine) it.block() else {
+                            requestLocationPermission()
+                        } }
+                }
+            }
+            .launchIn(this.lifecycleScope)
         // Turn off the decor fitting system windows, which allows us to handle insets,
         // including IME animations
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -111,6 +135,8 @@ class NavActivity : AppCompatActivity() {
         )
     }
 
+
+
     override fun onSupportNavigateUp(): Boolean {
         return findNavController().navigateUp() || super.onSupportNavigateUp()
     }
@@ -122,5 +148,41 @@ class NavActivity : AppCompatActivity() {
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.nav_host_fragment) as NavHostFragment
         return navHostFragment.navController
+    }
+
+    private fun requestLocationPermission() {
+        ActivityCompat.requestPermissions(
+            this,
+            arrayOf(
+                Manifest.permission.ACCESS_FINE_LOCATION,
+            ),
+            MY_PERMISSIONS_REQUEST_LOCATION
+        )
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            MY_PERMISSIONS_REQUEST_LOCATION -> {
+                // If request is cancelled, the result arrays are empty.
+               val granted = if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+
+                    // permission denied, boo! Disable the
+                    // functionality that depends on this permission.
+                    Toast.makeText(this, "permission denied", Toast.LENGTH_LONG).show()
+false
+                } else { true}
+                viewModel.permissionGranted(granted)
+                return
+            }
+        }
+    }
+
+    companion object {
+        private const val MY_PERMISSIONS_REQUEST_LOCATION = 99
     }
 }

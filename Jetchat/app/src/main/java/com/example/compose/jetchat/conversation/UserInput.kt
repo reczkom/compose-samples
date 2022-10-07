@@ -111,7 +111,7 @@ enum class EmojiStickerSelector {
 @Preview
 @Composable
 fun UserInputPreview() {
-    UserInput(onMessageSent = {})
+    UserInput(onMessageSent = {}, checkPermission = {})
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -119,6 +119,7 @@ fun UserInputPreview() {
 fun UserInput(
     onMessageSent: (String) -> Unit,
     modifier: Modifier = Modifier,
+    checkPermission: (block: () -> Unit) -> Unit,
     resetScroll: () -> Unit = {},
 ) {
     var currentInputSelector by rememberSaveable { mutableStateOf(InputSelector.NONE) }
@@ -152,7 +153,15 @@ fun UserInput(
                 focusState = textFieldFocusState
             )
             UserInputSelector(
-                onSelectorChange = { currentInputSelector = it },
+                onSelectorChange = {
+                    if (it == InputSelector.MAP) {
+                        checkPermission {
+                            currentInputSelector = it
+                        }
+                    } else {
+                        currentInputSelector = it
+                    }
+                                   },
                 sendMessageEnabled = textState.text.isNotBlank(),
                 onMessageSent = {
                     onMessageSent(textState.text)

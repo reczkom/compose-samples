@@ -80,6 +80,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.compose.jetchat.FunctionalityNotAvailablePopup
 import com.example.compose.jetchat.R
 import com.example.compose.jetchat.components.JetchatAppBar
@@ -101,6 +102,7 @@ fun ConversationContent(
     uiState: ConversationUiState,
     navigateToProfile: (String) -> Unit,
     modifier: Modifier = Modifier,
+    checkPermission: (block: () -> Unit) -> Unit,
     onNavIconPressed: () -> Unit = { }
 ) {
     val authorMe = stringResource(R.string.author_me)
@@ -140,6 +142,8 @@ fun ConversationContent(
                     modifier = Modifier
                         .navigationBarsPadding()
                         .imePadding(),
+
+                    checkPermission = checkPermission
                 )
             }
             // Channel name bar floats above the messages
@@ -496,7 +500,8 @@ fun ConversationPreview() {
     JetchatTheme {
         ConversationContent(
             uiState = exampleUiState,
-            navigateToProfile = { }
+            navigateToProfile = { },
+            checkPermission = { }
         )
     }
 }

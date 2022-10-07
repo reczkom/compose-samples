@@ -73,7 +73,8 @@ class ConversationFragment : Fragment() {
                             WindowInsets
                                 .navigationBars
                                 .only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
-                        )
+                        ),
+                        checkPermission = activityViewModel::checkPermission
                     )
                 }
             }
