@@ -78,6 +78,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.SemanticsPropertyKey
 import androidx.compose.ui.semantics.SemanticsPropertyReceiver
@@ -138,8 +139,7 @@ fun UserInput(
     Surface(tonalElevation = 2.dp) {
         Column(modifier = modifier) {
             UserInputText(
-                textFieldValue = textState,
-                onTextChanged = { textState = it },
+                textFieldValue = textState, onTextChanged = { textState = it },
                 // Only show the keyboard if there's no input selector and text field has focus
                 keyboardShown = currentInputSelector == InputSelector.NONE && textFieldFocusState,
                 // Close extended selector if text field receives focus
@@ -149,29 +149,24 @@ fun UserInput(
                         resetScroll()
                     }
                     textFieldFocusState = focused
-                },
-                focusState = textFieldFocusState
+                }, focusState = textFieldFocusState
             )
-            UserInputSelector(
-                onSelectorChange = {
-                    if (it == InputSelector.MAP) {
-                        checkPermission {
-                            currentInputSelector = it
-                        }
-                    } else {
+            UserInputSelector(onSelectorChange = {
+                if (it == InputSelector.MAP) {
+                    checkPermission {
                         currentInputSelector = it
                     }
-                                   },
-                sendMessageEnabled = textState.text.isNotBlank(),
-                onMessageSent = {
-                    onMessageSent(textState.text)
-                    // Reset text field and close keyboard
-                    textState = TextFieldValue()
-                    // Move scroll to bottom
-                    resetScroll()
-                    dismissKeyboard()
-                },
-                currentInputSelector = currentInputSelector
+                } else {
+                    currentInputSelector = it
+                }
+            }, sendMessageEnabled = textState.text.isNotBlank(), onMessageSent = {
+                onMessageSent(textState.text)
+                // Reset text field and close keyboard
+                textState = TextFieldValue()
+                // Move scroll to bottom
+                resetScroll()
+                dismissKeyboard()
+            }, currentInputSelector = currentInputSelector
             )
             SelectorExpanded(
                 onCloseRequested = dismissKeyboard,
@@ -184,13 +179,10 @@ fun UserInput(
 
 private fun TextFieldValue.addText(newString: String): TextFieldValue {
     val newText = this.text.replaceRange(
-        this.selection.start,
-        this.selection.end,
-        newString
+        this.selection.start, this.selection.end, newString
     )
     val newSelection = TextRange(
-        start = newText.length,
-        end = newText.length
+        start = newText.length, end = newText.length
     )
 
     return this.copy(text = newText, selection = newSelection)
@@ -198,9 +190,7 @@ private fun TextFieldValue.addText(newString: String): TextFieldValue {
 
 @Composable
 private fun SelectorExpanded(
-    currentSelector: InputSelector,
-    onCloseRequested: () -> Unit,
-    onTextAdded: (String) -> Unit
+    currentSelector: InputSelector, onCloseRequested: () -> Unit, onTextAdded: (String) -> Unit
 ) {
     if (currentSelector == InputSelector.NONE) return
 
@@ -220,7 +210,9 @@ private fun SelectorExpanded(
             InputSelector.PICTURE -> FunctionalityNotAvailablePanel()
             InputSelector.MAP -> FunctionalityNotAvailablePanel()
             InputSelector.PHONE -> FunctionalityNotAvailablePanel()
-            else -> { throw NotImplementedError() }
+            else -> {
+                throw NotImplementedError()
+            }
         }
     }
 }
@@ -236,7 +228,8 @@ fun FunctionalityNotAvailablePanel() {
         Column(
             modifier = Modifier
                 .height(320.dp)
-                .fillMaxWidth(),
+                .fillMaxWidth()
+                .testTag("functionNotAvailable"),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -270,30 +263,35 @@ private fun UserInputSelector(
         verticalAlignment = Alignment.CenterVertically
     ) {
         InputSelectorButton(
+            type = InputSelector.EMOJI,
             onClick = { onSelectorChange(InputSelector.EMOJI) },
             icon = Icons.Outlined.Mood,
             selected = currentInputSelector == InputSelector.EMOJI,
             description = stringResource(id = R.string.emoji_selector_bt_desc)
         )
         InputSelectorButton(
+            type = InputSelector.DM,
             onClick = { onSelectorChange(InputSelector.DM) },
             icon = Icons.Outlined.AlternateEmail,
             selected = currentInputSelector == InputSelector.DM,
             description = stringResource(id = R.string.dm_desc)
         )
         InputSelectorButton(
+            type = InputSelector.PICTURE,
             onClick = { onSelectorChange(InputSelector.PICTURE) },
             icon = Icons.Outlined.InsertPhoto,
             selected = currentInputSelector == InputSelector.PICTURE,
             description = stringResource(id = R.string.attach_photo_desc)
         )
         InputSelectorButton(
+            type = InputSelector.MAP,
             onClick = { onSelectorChange(InputSelector.MAP) },
             icon = Icons.Outlined.Place,
             selected = currentInputSelector == InputSelector.MAP,
             description = stringResource(id = R.string.map_selector_desc)
         )
         InputSelectorButton(
+            type = InputSelector.PHONE,
             onClick = { onSelectorChange(InputSelector.PHONE) },
             icon = Icons.Outlined.Duo,
             selected = currentInputSelector == InputSelector.PHONE,
@@ -302,8 +300,7 @@ private fun UserInputSelector(
 
         val border = if (!sendMessageEnabled) {
             BorderStroke(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                width = 1.dp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
             )
         } else {
             null
@@ -313,8 +310,7 @@ private fun UserInputSelector(
         val disabledContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
 
         val buttonColors = ButtonDefaults.buttonColors(
-            disabledContainerColor = Color.Transparent,
-            disabledContentColor = disabledContentColor
+            disabledContainerColor = Color.Transparent, disabledContentColor = disabledContentColor
         )
 
         // Send button
@@ -327,8 +323,7 @@ private fun UserInputSelector(
             contentPadding = PaddingValues(0.dp)
         ) {
             Text(
-                stringResource(id = R.string.send),
-                modifier = Modifier.padding(horizontal = 16.dp)
+                stringResource(id = R.string.send), modifier = Modifier.padding(horizontal = 16.dp)
             )
         }
     }
@@ -336,6 +331,7 @@ private fun UserInputSelector(
 
 @Composable
 private fun InputSelectorButton(
+    type: InputSelector,
     onClick: () -> Unit,
     icon: ImageVector,
     description: String,
@@ -343,15 +339,18 @@ private fun InputSelectorButton(
 ) {
     val backgroundModifier = if (selected) {
         Modifier.background(
-            color = MaterialTheme.colorScheme.secondary,
-            shape = RoundedCornerShape(14.dp)
+            color = MaterialTheme.colorScheme.secondary, shape = RoundedCornerShape(14.dp)
         )
     } else {
         Modifier
     }
     IconButton(
-        onClick = onClick,
-        modifier = Modifier.size(56.dp).then(backgroundModifier)
+        onClick = onClick, modifier = Modifier
+            .size(56.dp)
+            .then(backgroundModifier)
+            .testTag(
+                "selectorButton${type}"
+            )
     ) {
         val tint = if (selected) {
             MaterialTheme.colorScheme.onSecondary
@@ -359,10 +358,7 @@ private fun InputSelectorButton(
             MaterialTheme.colorScheme.secondary
         }
         Icon(
-            icon,
-            tint = tint,
-            modifier = Modifier.padding(16.dp),
-            contentDescription = description
+            icon, tint = tint, modifier = Modifier.padding(16.dp), contentDescription = description
         )
     }
 }
@@ -393,8 +389,7 @@ private fun UserInputText(
             .semantics {
                 contentDescription = a11ylabel
                 keyboardShownProperty = keyboardShown
-            },
-        horizontalArrangement = Arrangement.End
+            }, horizontalArrangement = Arrangement.End
     ) {
         Surface {
             Box(
@@ -418,16 +413,14 @@ private fun UserInputText(
                             lastFocusState = state.isFocused
                         },
                     keyboardOptions = KeyboardOptions(
-                        keyboardType = keyboardType,
-                        imeAction = ImeAction.Send
+                        keyboardType = keyboardType, imeAction = ImeAction.Send
                     ),
                     maxLines = 1,
                     cursorBrush = SolidColor(LocalContentColor.current),
                     textStyle = LocalTextStyle.current.copy(color = LocalContentColor.current)
                 )
 
-                val disableContentColor =
-                    MaterialTheme.colorScheme.onSurfaceVariant
+                val disableContentColor = MaterialTheme.colorScheme.onSurfaceVariant
                 if (textFieldValue.text.isEmpty() && !focusState) {
                     Text(
                         modifier = Modifier
@@ -444,19 +437,17 @@ private fun UserInputText(
 
 @Composable
 fun EmojiSelector(
-    onTextAdded: (String) -> Unit,
-    focusRequester: FocusRequester
+    onTextAdded: (String) -> Unit, focusRequester: FocusRequester
 ) {
     var selected by remember { mutableStateOf(EmojiStickerSelector.EMOJI) }
 
     val a11yLabel = stringResource(id = R.string.emoji_selector_desc)
-    Column(
-        modifier = Modifier
-            .focusRequester(focusRequester) // Requests focus when the Emoji selector is displayed
-            // Make the emoji selector focusable so it can steal focus from TextField
-            .focusTarget()
-            .semantics { contentDescription = a11yLabel }
-    ) {
+    Column(modifier = Modifier
+        .focusRequester(focusRequester) // Requests focus when the Emoji selector is displayed
+        // Make the emoji selector focusable so it can steal focus from TextField
+        .focusTarget()
+        .semantics { contentDescription = a11yLabel }
+        .testTag("emojiSelector")) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -486,10 +477,7 @@ fun EmojiSelector(
 
 @Composable
 fun ExtendedSelectorInnerButton(
-    text: String,
-    onClick: () -> Unit,
-    selected: Boolean,
-    modifier: Modifier = Modifier
+    text: String, onClick: () -> Unit, selected: Boolean, modifier: Modifier = Modifier
 ) {
     val colors = ButtonDefaults.buttonColors(
         containerColor = if (selected) MaterialTheme.colorScheme.onSurface.copy(alpha = 0.08f)
@@ -507,22 +495,19 @@ fun ExtendedSelectorInnerButton(
         contentPadding = PaddingValues(0.dp)
     ) {
         Text(
-            text = text,
-            style = MaterialTheme.typography.titleSmall
+            text = text, style = MaterialTheme.typography.titleSmall
         )
     }
 }
 
 @Composable
 fun EmojiTable(
-    onTextAdded: (String) -> Unit,
-    modifier: Modifier = Modifier
+    onTextAdded: (String) -> Unit, modifier: Modifier = Modifier
 ) {
     Column(modifier.fillMaxWidth()) {
         repeat(4) { x ->
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 repeat(EMOJI_COLUMNS) { y ->
                     val emoji = emojis[x * EMOJI_COLUMNS + y]
@@ -533,8 +518,7 @@ fun EmojiTable(
                             .padding(8.dp),
                         text = emoji,
                         style = LocalTextStyle.current.copy(
-                            fontSize = 18.sp,
-                            textAlign = TextAlign.Center
+                            fontSize = 18.sp, textAlign = TextAlign.Center
                         )
                     )
                 }
