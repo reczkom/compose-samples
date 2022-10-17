@@ -39,10 +39,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
 /**
  * Checks that the features in the Conversation screen work as expected.
  */
+@RunWith(
+    RobolectricTestRunner::class)
 class ConversationTest {
 
     @get:Rule

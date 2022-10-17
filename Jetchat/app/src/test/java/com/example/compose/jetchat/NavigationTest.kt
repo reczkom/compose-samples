@@ -31,10 +31,14 @@ import androidx.test.espresso.Espresso
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
 /**
  * Checks that the navigation flows in the app are correct.
  */
+@RunWith(
+    RobolectricTestRunner::class)
 class NavigationTest {
 
     @get:Rule

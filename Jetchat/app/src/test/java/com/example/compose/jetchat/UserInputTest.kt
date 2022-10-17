@@ -42,10 +42,14 @@ import org.junit.Before
 import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
 
 /**
  * Checks that the user input composable, including extended controls, behave as expected.
  */
+@RunWith(
+    RobolectricTestRunner::class)
 class UserInputTest {
 
     @get:Rule
