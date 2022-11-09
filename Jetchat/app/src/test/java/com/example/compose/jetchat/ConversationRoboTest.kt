@@ -43,7 +43,7 @@ import org.junit.Test
 /**
  * Checks that the features in the Conversation screen work as expected.
  */
-class ConversationTest {
+class ConversationRoboTest {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()

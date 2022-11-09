@@ -35,7 +35,7 @@ import org.junit.Test
 /**
  * Checks that the navigation flows in the app are correct.
  */
-class NavigationTest {
+class NavigationRoboTest {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<NavActivity>()

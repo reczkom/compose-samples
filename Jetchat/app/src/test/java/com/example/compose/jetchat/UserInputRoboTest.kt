@@ -46,7 +46,7 @@ import org.junit.Test
 /**
  * Checks that the user input composable, including extended controls, behave as expected.
  */
-class UserInputTest {
+class UserInputRoboTest {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
