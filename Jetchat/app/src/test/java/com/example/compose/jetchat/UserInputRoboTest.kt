@@ -50,7 +50,7 @@ import org.robolectric.RobolectricTestRunner
  */
 @RunWith(
     RobolectricTestRunner::class)
-class UserInputTest {
+class UserInputRoboTest {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()

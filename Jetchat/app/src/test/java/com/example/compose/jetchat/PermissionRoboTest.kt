@@ -23,7 +23,7 @@ import org.robolectric.shadows.ShadowApplication
 
 @RunWith(RobolectricTestRunner::class)
 @Config(minSdk = Build.VERSION_CODES.P)
-class PermissionTest {
+class PermissionRoboTest {
 
     @get:Rule
     val composeTestRule = createAndroidComposeRule<NavActivity>()
