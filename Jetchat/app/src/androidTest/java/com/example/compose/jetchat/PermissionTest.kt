@@ -41,6 +41,7 @@ class PermissionTest {
 
     }
 
+    /* This is not stable! We may be in another language, another SDK Version, etc... */
     private fun getAllowButtonText(): String {
         return  when(android.os.Build.VERSION.SDK_INT) {
             android.os.Build.VERSION_CODES.S -> when (Locale.getDefault()) {
