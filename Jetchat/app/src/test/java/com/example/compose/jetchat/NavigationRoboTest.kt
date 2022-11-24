@@ -16,6 +16,7 @@
 
 package com.example.compose.jetchat
 
+import android.os.Build
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.assertIsDisplayed
@@ -31,10 +32,15 @@ import androidx.test.espresso.Espresso
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
 /**
  * Checks that the navigation flows in the app are correct.
  */
+@RunWith(RobolectricTestRunner::class)
+@Config(minSdk = Build.VERSION_CODES.P)
 class NavigationRoboTest {
 
     @get:Rule
